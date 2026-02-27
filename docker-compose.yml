@@ -1,0 +1,89 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# grafana-mcp-app — Full Demo Stack
+#
+# Starts: Grafana + Prometheus + Node Exporter + grafana-mcp-app
+#
+# Usage:
+#   docker compose up
+#
+# Then:
+#   - Grafana:    http://localhost:3000  (admin/admin)
+#   - Prometheus: http://localhost:9090
+#
+# The MCP server connects with:
+#   GRAFANA_URL=http://localhost:3000
+#   GRAFANA_API_KEY=<service account token — see README>
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  # ── Prometheus ─────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: grafana-mcp-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./provisioning/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
+    restart: unless-stopped
+
+  # ── Node Exporter (host metrics) ───────────────────────────────────────────
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: grafana-mcp-node-exporter
+    pid: host
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    restart: unless-stopped
+
+  # ── Grafana ─────────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-mcp-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      # Security — allow iframe embedding for MCP App
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      # Anonymous access for demo (remove in production)
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+      # Default admin password
+      GF_SECURITY_ADMIN_USER: "admin"
+      GF_SECURITY_ADMIN_PASSWORD: "admin"
+      # Plugins
+      GF_INSTALL_PLUGINS: ""
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./provisioning/dashboard-files:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  grafana_data:
+  prometheus_data:
