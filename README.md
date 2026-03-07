@@ -1,33 +1,39 @@
 # grafana-mcp-app
 
-> **Grafana dashboards, live inside your AI conversations.**
+> **Community dashboard intelligence, rendered live inside your AI conversations.**
 
-An [MCP App](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) server that renders interactive Grafana panels directly in Claude, ChatGPT, VS Code, and Goose — no screenshots, no copy-pasting URLs. Just ask, and the dashboard appears.
-
-![Node Overview dashboard rendered in Grafana](./docs/demo.png)
+An [MCP App](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) server that renders interactive Chart.js visualizations directly in Claude, ChatGPT, VS Code, and Goose — grounded in the 126M+ downloads of community dashboards on the Grafana marketplace.
 
 ## Why?
 
-Every existing Grafana MCP server returns text or static PNG images. When you're debugging a production incident at 3am, you don't want a number — you want to *see* the spike, zoom in, and change the time range without leaving your conversation.
+The Grafana marketplace has the best PromQL queries in the world. Engineers have spent years tuning the CPU, memory, and disk metrics in the Node Exporter Full dashboard (126M downloads, 4.9 stars). Why write your own from scratch?
 
-`grafana-mcp-app` uses the [MCP Apps extension](https://github.com/modelcontextprotocol/ext-apps) to embed live, interactive Grafana panels in your AI chat window.
+With `grafana-mcp-app v2`, your AI can:
+
+1. Search the marketplace for relevant dashboards
+2. Extract the exact PromQL queries from community dashboards (96% token compression vs raw JSON)
+3. Render them as live Chart.js panels directly in your AI chat
+
+No Grafana instance required for the core workflow. Just Prometheus.
 
 ## Tools
 
 | Tool | Description | UI? |
 |------|-------------|-----|
-| `list_dashboards` | Browse available dashboards with search and tag filter | ✅ Interactive grid |
-| `show_panel` | Render a live panel with time range controls and refresh | ✅ Embedded iframe |
-| `query_metrics` | Run a PromQL query and return results as text | — Text only |
-| `list_alerts` | Show active alert rules grouped by state | — Text only |
+| `search_marketplace` | Search grafana.com/dashboards (126M+ community downloads, no auth) | — Text |
+| `import_dashboard` | Extract PromQL queries from any marketplace dashboard (96% compression) | — Text |
+| `render_panel` | Render live Chart.js charts directly in the conversation | Chart.js UI |
+| `query_prometheus` | Ad-hoc PromQL queries for analysis | — Text |
+| `list_dashboards` | Browse dashboards on your own Grafana instance | Interactive UI |
+| `list_alerts` | Show active alert rules from Grafana | — Text |
 
 ## Quick Start
 
 ### 1. Prerequisites
 
 - Node.js 20+
-- A Grafana instance (self-hosted or Grafana Cloud)
-- A Grafana [service account token](https://grafana.com/docs/grafana/latest/administration/service-accounts/) with `Viewer` role
+- Prometheus (for `render_panel` — to serve live metric data)
+- Optional: A Grafana instance with a service account token (for `list_dashboards`, `list_alerts`)
 
 ### 2. Install
 
@@ -52,6 +58,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "command": "npx",
       "args": ["grafana-mcp-app"],
       "env": {
+        "PROMETHEUS_URL": "http://localhost:9090",
         "GRAFANA_URL": "http://localhost:3000",
         "GRAFANA_API_KEY": "your-service-account-token"
       }
@@ -65,19 +72,18 @@ Restart Claude Desktop. You'll see the Grafana tools in the tool list.
 ### 4. Use It
 
 ```
-You: Show me the Node Overview dashboard
-Claude: [renders interactive CPU/memory/network panels inline]
-
-You: List all my dashboards
-Claude: [shows searchable dashboard grid]
-
-You: What's the current CPU usage?
-Claude: [calls query_metrics with node_cpu_seconds_total]
+You: I want to monitor my Node Exporter
+Claude: search_marketplace("node exporter")
+Claude: → Found Node Exporter Full (ID: 1860, 126M downloads, 4.9 stars)
+Claude: import_dashboard(1860, job="node")
+Claude: → Extracted 15 panels with PromQL (CPU gauge, RAM gauge, disk, network...)
+Claude: render_panel(expr="100 * (1 - avg(rate(...)))", type="gauge", title="CPU Usage")
+Claude: [live Chart.js gauge appears in your chat]
 ```
 
 ## Demo Stack (Docker Compose)
 
-Run a full demo with Grafana + Prometheus + Node Exporter — no Grafana Cloud account needed:
+Run a full demo with Prometheus + Node Exporter + Grafana — no cloud account needed:
 
 ```bash
 git clone https://github.com/jcanizalez/grafana-mcp-app
@@ -86,47 +92,23 @@ docker-compose up
 ```
 
 This starts:
-- **Grafana** at http://localhost:3000 (admin/admin) — with 2 provisioned dashboards
 - **Prometheus** at http://localhost:9090 — scraping Node Exporter
 - **Node Exporter** at http://localhost:9100 — real host metrics
+- **Grafana** at http://localhost:3000 (admin/admin) — optional, for list_dashboards
 
-Then connect the MCP server (no API key needed for the demo — anonymous access is enabled):
+Then connect the MCP server:
 
 ```bash
-GRAFANA_URL=http://localhost:3000 npm start
+PROMETHEUS_URL=http://localhost:9090 GRAFANA_URL=http://localhost:3000 npm start
 ```
 
 ## Configuration
 
 | Environment Variable | Description | Default |
 |---------------------|-------------|---------|
-| `GRAFANA_URL` | Grafana instance URL | `http://localhost:3000` |
-| `GRAFANA_API_KEY` | Service account token | *(empty — anonymous)* |
-
-### Grafana Setup Requirements
-
-Your Grafana instance needs iframe embedding enabled. Add to `grafana.ini`:
-
-```ini
-[security]
-allow_embedding = true
-```
-
-Or with Docker:
-
-```yaml
-environment:
-  GF_SECURITY_ALLOW_EMBEDDING: "true"
-```
-
-### Service Account Permissions
-
-Create a service account with these minimum permissions:
-
-```
-dashboards:read
-datasources:query
-```
+| `PROMETHEUS_URL` | Prometheus instance URL | `http://localhost:9090` |
+| `GRAFANA_URL` | Grafana instance URL (optional) | `http://localhost:3000` |
+| `GRAFANA_API_KEY` | Service account token (optional) | *(empty)* |
 
 ## Architecture
 
@@ -135,24 +117,21 @@ Claude / ChatGPT / VS Code
          │
          │ MCP (stdio or SSE)
          ▼
-  grafana-mcp-app (TypeScript)
-  ┌────────────────────────┐
-  │ Tools:                 │
-  │  list_dashboards ──────┼──→ ui://grafana/dashboard-list
-  │  show_panel ───────────┼──→ ui://grafana/panel-view
-  │  query_metrics         │
-  │  list_alerts           │
-  └──────────┬─────────────┘
-             │ HTTP API
-             ▼
-      Grafana Instance
-      /api/search
-      /api/dashboards/uid/:uid
-      /d-solo/:uid (iframe embed)
-      /api/ds/query (PromQL)
+  grafana-mcp-app v2 (TypeScript)
+  ┌──────────────────────────────────────┐
+  │ search_marketplace ──────────────────┼──→ grafana.com/api/dashboards
+  │ import_dashboard ────────────────────┼──→ grafana.com (download + extract)
+  │ render_panel ────────────────────────┼──→ ui://grafana/panel-render (Chart.js)
+  │                                      │         │
+  │ query_prometheus ────────────────────┼──→ Prometheus /api/v1/query_range
+  │ list_dashboards ─────────────────────┼──→ Grafana /api/search
+  │ list_alerts ─────────────────────────┼──→ Grafana /api/v1/alerts
+  └──────────────────────────────────────┘
 ```
 
-The interactive UI (panel-view, dashboard-list) is served as bundled HTML via `ui://` MCP resources. The AI client renders them in a sandboxed iframe — no external CDN, no build step required for end users.
+The `render_panel` tool queries Prometheus directly for live data, then renders a Chart.js visualization as a bundled MCP App HTML resource — no Grafana proxy needed.
+
+`import_dashboard` compresses dashboard JSON by 96% (248KB Node Exporter Full becomes ~2.7K tokens) by extracting only panel title, type, PromQL expressions, units, and thresholds.
 
 ## Development
 
@@ -163,14 +142,11 @@ npm install
 # Build (TypeScript + copy HTML bundles)
 npm run build
 
-# Run tests (12 unit tests, no Grafana needed)
+# Run tests (12 unit tests, no Prometheus or Grafana needed)
 npm test
 
 # Start server
-GRAFANA_URL=http://localhost:3000 npm start
-
-# Run integration test client
-GRAFANA_URL=http://localhost:3000 node scripts/test-client.js
+PROMETHEUS_URL=http://localhost:9090 GRAFANA_URL=http://localhost:3000 npm start
 ```
 
 ## License
@@ -179,4 +155,4 @@ MIT — © 2026 Javier Canizalez
 
 ---
 
-*Built with [MCP Apps SDK](https://github.com/modelcontextprotocol/ext-apps) · Companion article: [Grafana Dashboards Inside Your AI Chat](https://medium.com/@javier-canizalez)*
+*Built with [MCP Apps SDK](https://github.com/modelcontextprotocol/ext-apps) · Companion article: [Live Grafana Dashboards in Your AI Chat](https://medium.com/@javier-canizalez)*

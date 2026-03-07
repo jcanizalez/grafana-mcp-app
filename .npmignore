@@ -1,0 +1,24 @@
+# Source files (consumers use the compiled dist/)
+src/
+*.ts
+!*.d.ts
+tsconfig.json
+
+# Research and development artifacts
+research/
+scripts/
+
+# Large media (not needed at runtime)
+docs/images/
+docs/diagrams/*.png
+docs/screenshots/
+
+# Source maps (optional, remove if you want debugging support)
+dist/**/*.js.map
+dist/**/*.d.ts.map
+dist/__tests__/
+
+# Dev files
+.env
+.env.*
+*.log

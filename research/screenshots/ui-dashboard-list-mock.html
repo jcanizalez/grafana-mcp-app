@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grafana Dashboards</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #111217;
+      color: #d9d9d9;
+      height: 420px;
+      width: 680px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #181b1f;
+      border-bottom: 1px solid #2c3235;
+      flex-shrink: 0;
+    }
+
+    #header h1 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e0852a;
+      flex: 1;
+    }
+
+    #search-input {
+      background: #22262b;
+      border: 1px solid #2c3235;
+      border-radius: 4px;
+      color: #d9d9d9;
+      font-size: 12px;
+      padding: 5px 10px;
+      width: 200px;
+      outline: none;
+    }
+
+    #count { font-size: 12px; color: #6c757d; }
+
+    #dashboard-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
+      align-content: start;
+    }
+
+    #dashboard-list::-webkit-scrollbar { width: 6px; }
+    #dashboard-list::-webkit-scrollbar-track { background: transparent; }
+    #dashboard-list::-webkit-scrollbar-thumb { background: #2c3235; border-radius: 3px; }
+
+    .dashboard-card {
+      background: #181b1f;
+      border: 1px solid #2c3235;
+      border-radius: 6px;
+      padding: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .dashboard-card:hover {
+      border-color: #3b6dc5;
+      background: #1d2126;
+    }
+
+    .dashboard-card.active {
+      border-color: #e0852a;
+      background: #1d2126;
+    }
+
+    .card-icon { font-size: 20px; }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e0e0e0;
+      line-height: 1.3;
+    }
+
+    .card-folder {
+      font-size: 11px;
+      color: #6c757d;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      background: #22262b;
+      border-radius: 3px;
+      font-size: 10px;
+      padding: 2px 6px;
+      color: #9fa7b3;
+    }
+
+    .card-action {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #3b6dc5;
+    }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <h1>📊 Grafana Dashboards</h1>
+    <input id="search-input" type="text" placeholder="Filter dashboards..." />
+    <span id="count">4 dashboards</span>
+  </div>
+
+  <div id="dashboard-list">
+    <div class="dashboard-card active">
+      <div class="card-icon">🖥️</div>
+      <div class="card-title">Node Overview</div>
+      <div class="card-folder">📁 Infrastructure</div>
+      <div class="card-tags">
+        <span class="tag">node</span>
+        <span class="tag">host</span>
+        <span class="tag">linux</span>
+      </div>
+      <div class="card-action">→ Show panel</div>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Prometheus Stats</div>
+      <div class="card-folder">📁 Monitoring</div>
+      <div class="card-tags">
+        <span class="tag">prometheus</span>
+        <span class="tag">metrics</span>
+      </div>
+      <div class="card-action">→ Show panel</div>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="card-icon">⚙️</div>
+      <div class="card-title">API Response Times</div>
+      <div class="card-folder">📁 Application</div>
+      <div class="card-tags">
+        <span class="tag">application</span>
+        <span class="tag">latency</span>
+      </div>
+      <div class="card-action">→ Show panel</div>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="card-icon">🗄️</div>
+      <div class="card-title">PostgreSQL Metrics</div>
+      <div class="card-folder">📁 Databases</div>
+      <div class="card-tags">
+        <span class="tag">database</span>
+        <span class="tag">postgres</span>
+      </div>
+      <div class="card-action">→ Show panel</div>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="card-icon">🌐</div>
+      <div class="card-title">Network Traffic</div>
+      <div class="card-folder">📁 Infrastructure</div>
+      <div class="card-tags">
+        <span class="tag">network</span>
+        <span class="tag">bandwidth</span>
+      </div>
+      <div class="card-action">→ Show panel</div>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="card-icon">☸️</div>
+      <div class="card-title">Kubernetes Cluster</div>
+      <div class="card-folder">📁 Kubernetes</div>
+      <div class="card-tags">
+        <span class="tag">kubernetes</span>
+        <span class="tag">k8s</span>
+        <span class="tag">pods</span>
+      </div>
+      <div class="card-action">→ Show panel</div>
+    </div>
+  </div>
+</body>
+</html>

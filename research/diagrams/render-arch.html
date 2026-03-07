@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: white; display: inline-block; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="500" viewBox="0 0 1400 500" style="background:white; font-family: 'Helvetica Neue', Arial, sans-serif;">
+
+  <!-- Background panels -->
+  <!-- AI Client (blue) -->
+  <rect x="10" y="20" width="280" height="460" rx="12" fill="#EBF5FB" stroke="#3498DB" stroke-width="2"/>
+  <rect x="10" y="20" width="280" height="40" rx="12" fill="#3498DB"/>
+  <rect x="10" y="48" width="280" height="12" fill="#3498DB"/>
+  <text x="150" y="46" text-anchor="middle" fill="white" font-size="15" font-weight="bold">AI Client</text>
+
+  <!-- grafana-mcp-app (green) -->
+  <rect x="330" y="20" width="320" height="460" rx="12" fill="#EAFAF1" stroke="#2ECC71" stroke-width="2"/>
+  <rect x="330" y="20" width="320" height="40" rx="12" fill="#2ECC71"/>
+  <rect x="330" y="48" width="320" height="12" fill="#2ECC71"/>
+  <text x="490" y="38" text-anchor="middle" fill="white" font-size="13" font-weight="bold">grafana-mcp-app</text>
+  <text x="490" y="54" text-anchor="middle" fill="white" font-size="10">(TypeScript MCP Server)</text>
+
+  <!-- Grafana Instance (yellow) -->
+  <rect x="690" y="20" width="320" height="460" rx="12" fill="#FEF9E7" stroke="#F39C12" stroke-width="2"/>
+  <rect x="690" y="20" width="320" height="40" rx="12" fill="#F39C12"/>
+  <rect x="690" y="48" width="320" height="12" fill="#F39C12"/>
+  <text x="850" y="46" text-anchor="middle" fill="white" font-size="15" font-weight="bold">Grafana Instance</text>
+
+  <!-- Data Sources (red) -->
+  <rect x="1050" y="100" width="200" height="220" rx="12" fill="#FDEDEC" stroke="#E74C3C" stroke-width="2"/>
+  <rect x="1050" y="100" width="200" height="40" rx="12" fill="#E74C3C"/>
+  <rect x="1050" y="128" width="200" height="12" fill="#E74C3C"/>
+  <text x="1150" y="126" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Data Sources</text>
+
+  <!-- AI Client inner boxes -->
+  <!-- User box -->
+  <rect x="25" y="80" width="110" height="50" rx="8" fill="white" stroke="#3498DB" stroke-width="1.5"/>
+  <text x="80" y="102" text-anchor="middle" font-size="18">👤</text>
+  <text x="80" y="120" text-anchor="middle" fill="#2C3E50" font-size="11">User</text>
+
+  <!-- LLM box -->
+  <rect x="155" y="80" width="120" height="50" rx="8" fill="white" stroke="#3498DB" stroke-width="1.5"/>
+  <text x="215" y="102" text-anchor="middle" font-size="18">🤖</text>
+  <text x="215" y="120" text-anchor="middle" fill="#2C3E50" font-size="11">LLM</text>
+
+  <!-- MCP App UI -->
+  <rect x="40" y="280" width="230" height="80" rx="8" fill="#D6EAF8" stroke="#2980B9" stroke-width="1.5"/>
+  <text x="155" y="304" text-anchor="middle" font-size="18">📊</text>
+  <text x="155" y="322" text-anchor="middle" fill="#1A5276" font-size="12" font-weight="bold">MCP App UI</text>
+  <text x="155" y="340" text-anchor="middle" fill="#1A5276" font-size="10">(sandboxed iframe)</text>
+
+  <!-- grafana-mcp-app inner boxes -->
+  <!-- list_dashboards -->
+  <rect x="345" y="80" width="290" height="60" rx="6" fill="white" stroke="#2ECC71" stroke-width="1.5"/>
+  <text x="490" y="106" text-anchor="middle" fill="#1E8449" font-size="12" font-weight="bold">list_dashboards</text>
+  <text x="490" y="124" text-anchor="middle" fill="#239B56" font-size="10">+ ui://dashboard-list</text>
+
+  <!-- show_panel -->
+  <rect x="345" y="160" width="290" height="60" rx="6" fill="white" stroke="#2ECC71" stroke-width="1.5"/>
+  <text x="490" y="186" text-anchor="middle" fill="#1E8449" font-size="12" font-weight="bold">show_panel</text>
+  <text x="490" y="204" text-anchor="middle" fill="#239B56" font-size="10">+ ui://panel-view</text>
+
+  <!-- query_metrics -->
+  <rect x="345" y="240" width="135" height="50" rx="6" fill="white" stroke="#2ECC71" stroke-width="1.5"/>
+  <text x="412" y="270" text-anchor="middle" fill="#1E8449" font-size="11">query_metrics</text>
+
+  <!-- list_alerts -->
+  <rect x="500" y="240" width="135" height="50" rx="6" fill="white" stroke="#2ECC71" stroke-width="1.5"/>
+  <text x="567" y="270" text-anchor="middle" fill="#1E8449" font-size="11">list_alerts</text>
+
+  <!-- Grafana inner boxes -->
+  <!-- HTTP API -->
+  <rect x="705" y="80" width="290" height="75" rx="6" fill="white" stroke="#F39C12" stroke-width="1.5"/>
+  <text x="850" y="104" text-anchor="middle" fill="#784212" font-size="12" font-weight="bold">HTTP API</text>
+  <text x="850" y="122" text-anchor="middle" fill="#784212" font-size="10">/api/search</text>
+  <text x="850" y="140" text-anchor="middle" fill="#784212" font-size="10">/api/dashboards/uid/:uid</text>
+
+  <!-- iframe Embed -->
+  <rect x="705" y="175" width="135" height="65" rx="6" fill="white" stroke="#F39C12" stroke-width="1.5"/>
+  <text x="772" y="200" text-anchor="middle" fill="#784212" font-size="11" font-weight="bold">iframe Embed</text>
+  <text x="772" y="220" text-anchor="middle" fill="#784212" font-size="10">/d-solo/:uid</text>
+
+  <!-- Datasource Proxy -->
+  <rect x="860" y="175" width="135" height="65" rx="6" fill="white" stroke="#F39C12" stroke-width="1.5"/>
+  <text x="927" y="200" text-anchor="middle" fill="#784212" font-size="11" font-weight="bold">Datasource Proxy</text>
+  <text x="927" y="220" text-anchor="middle" fill="#784212" font-size="10">/api/ds/query</text>
+
+  <!-- Data Sources inner boxes -->
+  <rect x="1065" y="155" width="170" height="45" rx="6" fill="white" stroke="#E74C3C" stroke-width="1.5"/>
+  <text x="1150" y="183" text-anchor="middle" fill="#78281F" font-size="12">Prometheus</text>
+
+  <rect x="1065" y="215" width="170" height="45" rx="6" fill="white" stroke="#E74C3C" stroke-width="1.5"/>
+  <text x="1150" y="243" text-anchor="middle" fill="#78281F" font-size="12">Loki / InfluxDB</text>
+
+  <!-- ARROWS -->
+
+  <!-- User to LLM: prompt -->
+  <line x1="135" y1="105" x2="155" y2="105" stroke="#3498DB" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <text x="145" y="100" text-anchor="middle" fill="#2471A3" font-size="9">prompt</text>
+
+  <!-- LLM to MCP Server: MCP stdio/SSE -->
+  <path d="M 275 105 L 310 105 L 310 110 L 330 110" stroke="#7D3C98" stroke-width="2" fill="none" marker-end="url(#arrow-purple)"/>
+  <text x="305" y="100" text-anchor="middle" fill="#7D3C98" font-size="9">MCP stdio/SSE</text>
+
+  <!-- list_dashboards to HTTP API -->
+  <line x1="635" y1="110" x2="705" y2="115" stroke="#F39C12" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+  <text x="670" y="107" text-anchor="middle" fill="#D35400" font-size="9">GET /api/dashboards</text>
+
+  <!-- show_panel to iframe Embed -->
+  <line x1="635" y1="190" x2="705" y2="205" stroke="#F39C12" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-orange)"/>
+  <text x="670" y="187" text-anchor="middle" fill="#D35400" font-size="9">iframe src=</text>
+
+  <!-- query_metrics to Datasource Proxy -->
+  <path d="M 480 265 L 650 265 L 650 210 L 860 210" stroke="#F39C12" stroke-width="1.5" fill="none" marker-end="url(#arrow-orange)"/>
+  <text x="660" y="260" text-anchor="middle" fill="#D35400" font-size="9">POST /api/ds/query</text>
+
+  <!-- Datasource Proxy to Prometheus -->
+  <line x1="995" y1="205" x2="1065" y2="178" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  <text x="1035" y="193" text-anchor="middle" fill="#C0392B" font-size="9">PromQL</text>
+
+  <!-- MCP Server returns to LLM: tool result (dashed) -->
+  <path d="M 490 77 L 490 60 L 215 60 L 215 77" stroke="#7D3C98" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#arrow-purple)"/>
+  <text x="350" y="54" text-anchor="middle" fill="#7D3C98" font-size="9">tool result + ui://panel-view</text>
+
+  <!-- LLM renders to MCP App UI -->
+  <path d="M 215 132 L 215 280" stroke="#3498DB" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#arrow-blue)"/>
+  <text x="230" y="210" fill="#2471A3" font-size="9">renders</text>
+  <text x="230" y="222" fill="#2471A3" font-size="9">HTML</text>
+
+  <!-- MCP App UI live embed to Grafana iframe -->
+  <path d="M 270 320 L 772 320 L 772 242" stroke="#2980B9" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#arrow-blue)"/>
+  <text x="520" y="340" text-anchor="middle" fill="#2471A3" font-size="9">live embed (iframe)</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#3498DB"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#7D3C98"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#F39C12"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#E74C3C"/>
+    </marker>
+  </defs>
+</svg>
+</body>
+</html>
